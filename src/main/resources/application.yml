@@ -1,5 +1,7 @@
 
 spring:
+  profiles:
+    include: oauth
   jpa:
     show-sql: true
     properties:
@@ -11,3 +13,6 @@ spring:
     url: jdbc:mysql://localhost:3306/workfolio?serverTimezone=Asia/Seoul
     username: workfolio
     password: 1234
+jwt:
+  issuer: toulim0525@gmail.com
+  secret_key: workfolio
