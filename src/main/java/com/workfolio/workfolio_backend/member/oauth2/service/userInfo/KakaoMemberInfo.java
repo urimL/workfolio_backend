@@ -3,26 +3,34 @@ package com.workfolio.workfolio_backend.member.oauth2.service.userInfo;
 import java.util.Map;
 
 public class KakaoMemberInfo implements OAuth2MemberInfo {
+
+    private Map<String, Object> attributes;
+    private Map<String, Object> kakaoAccountAttributes;
+    private Map<String, Object> profileAttributes;
+
     public KakaoMemberInfo(Map<String, Object> attributes) {
+        this.attributes = attributes;
+        this.kakaoAccountAttributes = (Map<String, Object>) attributes.get("kakao_account");
+        this.profileAttributes = (Map<String, Object>) attributes.get("profile");
     }
 
     @Override
     public String getProviderId() {
-        return null;
+        return attributes.get("id").toString();
     }
 
     @Override
     public String getProvider() {
-        return null;
+        return "kakao";
     }
 
     @Override
     public String getName() {
-        return null;
+        return kakaoAccountAttributes.get("nickname").toString();
     }
 
     @Override
     public String getEmail() {
-        return null;
+        return kakaoAccountAttributes.get("email").toString();
     }
 }

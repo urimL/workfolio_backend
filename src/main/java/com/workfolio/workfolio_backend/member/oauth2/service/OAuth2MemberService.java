@@ -33,7 +33,7 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         if (registrationId.equals("google")) {
             memberInfo = new GoogleMemberInfo(oAuth2User.getAttributes());
         } else if (registrationId.equals("kakao")) {
-            memberInfo = new KakaoMemberInfo((Map)oAuth2User.getAttributes().get("response"));
+            memberInfo = new KakaoMemberInfo(oAuth2User.getAttributes());
         } else if (registrationId.equals("naver")) {
             memberInfo = new NaverMemberInfo((Map)oAuth2User.getAttributes().get("response"));
         } else {
