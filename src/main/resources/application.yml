@@ -2,17 +2,17 @@
 spring:
   profiles:
     include: oauth
-  jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-    defer-datasource-initialization: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/workfolio?serverTimezone=Asia/Seoul
     username: workfolio
     password: 1234
-jwt:
-  issuer: toulim0525@gmail.com
-  secret_key: workfolio
+  jpa:
+    show-sql: true
+    hibernate:
+      show-sql: true
+      format_sql: true
+      dialect: org.hibernate.dialect.MySQLDialect
+      ddl-auto: update
+    defer-datasource-initialization: true
+
