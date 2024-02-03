@@ -1,83 +1,84 @@
 package com.workfolio.workfolio_backend.config.oauth2;
 
 import com.workfolio.workfolio_backend.config.jwt.TokenProvider;
-import com.workfolio.workfolio_backend.member.domain.Member;
-import com.workfolio.workfolio_backend.member.domain.RefreshToken;
-import com.workfolio.workfolio_backend.member.repository.RefreshTokenRepository;
 import com.workfolio.workfolio_backend.member.util.CookieUtil;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.time.Duration;
+import java.net.URI;
+import java.util.Optional;
 
-@RequiredArgsConstructor
+import static com.workfolio.workfolio_backend.config.oauth2.OAuth2AuthorizationRequestBasedOnCookieRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
+
+@Log4j2
 @Component
+@RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-    public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
-    public static final Duration REFRESH_TOKEN_DURATION = Duration.ofDays(14);
-    public static final Duration ACCESS_TOKEN_DURATION = Duration.ofDays(1);
-    public static final String REDIRECT_PATH = "/";
 
     private final TokenProvider tokenProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final OAuth2AuthorizationRequestBasedOnCookieRepository authorizationRequestRepository;
-    private final OAuth2MemberService oAuth2MemberService;
-
+    private final OAuth2AuthorizationRequestBasedOnCookieRepository authorizationRequestBasedOnCookieRepository;
+    // 로그인 성공해서 생성된 JWT를 authorizedRedirectUri로 client에게 전달
+    @Value("${app.authorizedRedirectUri}")
+    private String redirectUri;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest req, HttpServletResponse resp, Authentication authentication) throws IOException {
-        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-        Member member = oAuth2MemberService.findByEmail((String) oAuth2User.getAttributes().get("email"));
+        String targetUrl = determineTargetUrl(req, resp, authentication);
 
-        //리프레시 토큰 생성 -> 저장 -> 쿠키에 저장
-        String refreshToken = tokenProvider.generateToken(member, REFRESH_TOKEN_DURATION);
-        saveRefreshToken(member.getId(), refreshToken); //refresh token DB에 저장
-        addRefreshTokenToCookie(req, resp, refreshToken); //토큰 만료 시 재발급 요청하도록 쿠키에 리프레시 토큰 저장
+        if (resp.isCommitted()) {
+            logger.debug("Response has already been committed");
+            return;
+        }
 
-        //엑세스 토큰 생성 -> 패스에 액세스 토큰 추가
-        String accessToken = tokenProvider.generateToken(member, ACCESS_TOKEN_DURATION); //액세스 토큰 생성
-        String targetUrl = getTargetUrl(accessToken); //쿼리 파라미터에 액세스 토큰 추가
-
-        //임시로 저장해둔 인증 관련 설정값, 쿠키 제거
         clearAuthenticationAttributes(req, resp);
-
-        //redirect
         getRedirectStrategy().sendRedirect(req, resp, targetUrl);
     }
 
-    //생성된 리프레시 토큰 전달받아 DB에 저장
-    private void saveRefreshToken(Long userId, String newRefreshToken) {
-        RefreshToken refreshToken = refreshTokenRepository.findByUserId(userId)
-                .map(entity -> entity.update(newRefreshToken))
-                .orElse(new RefreshToken(userId, newRefreshToken));
+    protected String determineTargetUrl(HttpServletRequest req, HttpServletResponse resp, Authentication authentication) {
+        Optional<String> redirectUri = CookieUtil.getCookie(req, REDIRECT_URI_PARAM_COOKIE_NAME)
+                .map(Cookie::getValue);
 
-        refreshTokenRepository.save(refreshToken);
-    }
+        if (redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
+            throw new IllegalArgumentException("Redirect URIs are not matched");
+        }
 
-    //생성된 리프레시 토큰 쿠키에 저장
-    private void addRefreshTokenToCookie(HttpServletRequest req, HttpServletResponse resp, String refreshToken) {
-        int cookieMaxAge = (int) REFRESH_TOKEN_DURATION.toSeconds();
-        CookieUtil.deleteCookie(req, resp, REFRESH_TOKEN_COOKIE_NAME);
-        CookieUtil.addCookie(resp, REFRESH_TOKEN_COOKIE_NAME, refreshToken, cookieMaxAge);
-    }
+        String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
-    //인증 관련 설정값, 쿠키 제거
-    private void clearAuthenticationAttributes(HttpServletRequest req, HttpServletResponse resp) {
-        super.clearAuthenticationAttributes(req);
-        authorizationRequestRepository.removeAuthorizationRequestCookies(req, resp);
-    }
+        //create JWT
+        String accessToken = tokenProvider.createAccessToken(authentication);
+        tokenProvider.createRefreshToken(authentication, resp);
 
-    //엑세스 토큰을 패스에 추가
-    private String getTargetUrl(String token) {
-        return UriComponentsBuilder.fromUriString(REDIRECT_PATH)
-                .queryParam("token", token)
+        return UriComponentsBuilder.fromUriString(targetUrl)
+                .queryParam("accessToken", accessToken)
                 .build().toUriString();
     }
+
+    protected void clearAuthenticationAttributes(HttpServletRequest req, HttpServletResponse resp) {
+        super.clearAuthenticationAttributes(req);
+        authorizationRequestBasedOnCookieRepository.removeAuthorizationRequestCookies(req, resp);
+    }
+
+    private boolean isAuthorizedRedirectUri(String uri) {
+        URI clientRedirectUri = URI.create(uri);
+        URI authorizedUri = URI.create(redirectUri);
+
+        if (authorizedUri.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
+            && authorizedUri.getPort() == clientRedirectUri.getPort()) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+
 }

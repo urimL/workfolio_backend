@@ -19,3 +19,5 @@ spring:
 jwt:
   issuer: toulim0525@gmail.com
   secret_key: 94641f01e1af406da538b9c48a801ce59543452199ff132fb5404c8e7e98e3ff
+  refresh_cookie_key: "refresh"
+
