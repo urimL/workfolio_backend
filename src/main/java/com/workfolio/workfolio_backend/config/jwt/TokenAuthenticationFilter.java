@@ -1,6 +1,5 @@
 package com.workfolio.workfolio_backend.config.jwt;
 
-import com.workfolio.workfolio_backend.config.jwt.TokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,17 +26,18 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         String token = parseBearerToken(request);
 
         // access token validate
-        if (StringUtils.hasText(token) && tokenProvider.validToken(token)) {
+        if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
             Authentication authentication = tokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            log.debug(authentication.getName() + "의 인증정보 저장");
         } else {
-            log.debug("No validated JWT token");
+            log.debug("유효한 JWT 토큰이 없습니다.");
         }
         filterChain.doFilter(request, response);
     }
 
-    private String parseBearerToken(HttpServletRequest req) {
-        String bearerToken = req.getHeader("Authorization");
+    private String parseBearerToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
 
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);

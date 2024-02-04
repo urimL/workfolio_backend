@@ -1,4 +1,4 @@
-package com.workfolio.workfolio_backend.config.oauth2;
+package com.workfolio.workfolio_backend.config.oauth2.repository;
 
 import com.nimbusds.oauth2.sdk.util.StringUtils;
 import com.workfolio.workfolio_backend.member.util.CookieUtil;
@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
 //인증 요청과 관련된 상태를 저장할 저장소
 @Component
 public class OAuth2AuthorizationRequestBasedOnCookieRepository implements AuthorizationRequestRepository {
-    public final static String OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME = "oauth2_auth_request";
-    private final static int COOKIE_EXPIRE_SECONDS = 18000;
+    public static final String OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME = "oauth2_auth_request";
     public static final String REDIRECT_URI_PARAM_COOKIE_NAME = "redirect_uri";
+    private static final int COOKIE_EXPIRE_SECONDS = 180;
 
     @Override
     public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {
@@ -48,5 +48,4 @@ public class OAuth2AuthorizationRequestBasedOnCookieRepository implements Author
         CookieUtil.deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
         CookieUtil.deleteCookie(request, response, REDIRECT_URI_PARAM_COOKIE_NAME);
     }
-
 }

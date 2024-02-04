@@ -12,59 +12,57 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Log4j2
-@Service
+@Component
 public class TokenProvider {
 
     private final String SECRET_KEY;
     private final String COOKIE_REFRESH_TOKEN_KEY;
-    private final Long ACCESS_TOKEN_EXPIRE_LENGTH = 1000L * 60 * 60;        // 1hour
-    private final Long REFRESH_TOKEN_EXPIRE_LENGTH = 1000L * 60 * 60 * 24 * 7;    // 1week
+    private final Long ACCESS_TOKEN_EXPIRE_LENGTH = 1000L * 60 * 60;		// 1hour
+    private final Long REFRESH_TOKEN_EXPIRE_LENGTH = 1000L * 60 * 60 * 24 * 7;	// 1week
     private final String AUTHORITIES_KEY = "role";
-    private final String ISSUER;
 
     @Autowired
     private MemberRepository memberRepository;
 
-    public TokenProvider(@Value("${jwt.issuer}") String issuer, @Value("${jwt.secret_key}") String secretKey, @Value("${jwt.refresh_cookie_key}") String cookieKey) {
+    public TokenProvider(@Value("${jwt.secret_key}")String secretKey, @Value("${jwt.refresh_cookie_key}")String cookieKey) {
         this.SECRET_KEY = Base64.getEncoder().encodeToString(secretKey.getBytes());
         this.COOKIE_REFRESH_TOKEN_KEY = cookieKey;
-        this.ISSUER = issuer;
     }
 
     public String createAccessToken(Authentication authentication) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + ACCESS_TOKEN_EXPIRE_LENGTH);
 
-        PrincipalDetails member = (PrincipalDetails) authentication.getPrincipal();
+        PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
 
-        String memberId = member.getName();
+        String userId = user.getName();
         String role = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
-                .setSubject(memberId)
+                .setSubject(userId)
                 .claim(AUTHORITIES_KEY, role)
-                .setIssuer(ISSUER)
+                .setIssuer("urim")
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .compact();
     }
 
-    public void createRefreshToken(Authentication authentication, HttpServletResponse resp) {
+    public void createRefreshToken(Authentication authentication, HttpServletResponse response) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + REFRESH_TOKEN_EXPIRE_LENGTH);
 
         String refreshToken = Jwts.builder()
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
-                .setIssuer(ISSUER)
+                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                .setIssuer("urim")
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .compact();
@@ -75,23 +73,23 @@ public class TokenProvider {
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("Lax")
-                .maxAge(REFRESH_TOKEN_EXPIRE_LENGTH / 1000)
+                .maxAge(REFRESH_TOKEN_EXPIRE_LENGTH/1000)
                 .path("/")
                 .build();
 
-        resp.addHeader("Set-Cookie", cookie.toString());
+        response.addHeader("Set-Cookie", cookie.toString());
     }
 
     private void saveRefreshToken(Authentication authentication, String refreshToken) {
-        PrincipalDetails member = (PrincipalDetails) authentication.getPrincipal();
-        Long id = Long.valueOf(member.getName());
+        PrincipalDetails user = (PrincipalDetails) authentication.getPrincipal();
+        Long id = Long.valueOf(user.getName());
 
         memberRepository.updateRefreshToken(id, refreshToken);
     }
 
-    //accesstoken 검사 + 얻은 정보로 authentication 객체 생성
-    public Authentication getAuthentication(String accessToekn) {
-        Claims claims = parseClaims(accessToekn);
+    // Access Token을 검사하고 얻은 정보로 Authentication 객체 생성
+    public Authentication getAuthentication(String accessToken) {
+        Claims claims = parseClaims(accessToken);
 
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
@@ -102,16 +100,7 @@ public class TokenProvider {
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
-    private Claims parseClaims(String accessToekn) {
-        try {
-            return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(accessToekn).getBody();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
-        }
-    }
-
-    //token validation
-    public boolean validToken(String token) {
+    public Boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
             return true;
@@ -125,5 +114,12 @@ public class TokenProvider {
         return false;
     }
 
-
+    // Access Token 만료시 갱신때 사용할 정보를 얻기 위해 Claim 리턴
+    private Claims parseClaims(String accessToken) {
+        try {
+            return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(accessToken).getBody();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        }
+    }
 }

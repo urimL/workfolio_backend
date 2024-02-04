@@ -1,6 +1,7 @@
-package com.workfolio.workfolio_backend.config.oauth2;
+package com.workfolio.workfolio_backend.config.oauth2.handler;
 
 import com.workfolio.workfolio_backend.config.jwt.TokenProvider;
+import com.workfolio.workfolio_backend.config.oauth2.repository.OAuth2AuthorizationRequestBasedOnCookieRepository;
 import com.workfolio.workfolio_backend.member.util.CookieUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,17 +18,17 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
 
-import static com.workfolio.workfolio_backend.config.oauth2.OAuth2AuthorizationRequestBasedOnCookieRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
+import static com.workfolio.workfolio_backend.config.oauth2.repository.OAuth2AuthorizationRequestBasedOnCookieRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Log4j2
 @Component
 @RequiredArgsConstructor
-public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final TokenProvider tokenProvider;
     private final OAuth2AuthorizationRequestBasedOnCookieRepository authorizationRequestBasedOnCookieRepository;
     // 로그인 성공해서 생성된 JWT를 authorizedRedirectUri로 client에게 전달
-    @Value("${app.authorizedRedirectUri}")
+    @Value("${app.oauth2.authorizedRedirectUris}")
     private String redirectUri;
 
     @Override
