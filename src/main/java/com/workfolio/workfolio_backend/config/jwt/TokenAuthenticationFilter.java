@@ -18,14 +18,13 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
-
     private final TokenProvider tokenProvider;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = parseBearerToken(request);
-
-        // access token validate
+        System.out.println(token);
+        // Validation Access Token
         if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
             Authentication authentication = tokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -33,6 +32,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         } else {
             log.debug("유효한 JWT 토큰이 없습니다.");
         }
+
         filterChain.doFilter(request, response);
     }
 
@@ -42,7 +42,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
-
         return null;
     }
 }

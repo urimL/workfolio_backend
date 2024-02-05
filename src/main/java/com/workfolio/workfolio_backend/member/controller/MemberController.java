@@ -25,8 +25,8 @@ public class MemberController {
         return memberRepository.findById(user.getId()).orElseThrow(() -> new IllegalStateException("not found user"));
     }
 
-//    @GetMapping("/loginForm")
-//    public String login() {
-//        return "loginForm";
-//    }
+    @GetMapping("/loginForm")
+    public String login() {
+        return "loginForm";
+    }
 }

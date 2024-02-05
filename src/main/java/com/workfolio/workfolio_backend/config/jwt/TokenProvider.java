@@ -14,12 +14,16 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
+
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 @Log4j2
 @Component
 public class TokenProvider {
+
+
 
     private final String SECRET_KEY;
     private final String COOKIE_REFRESH_TOKEN_KEY;
@@ -46,7 +50,7 @@ public class TokenProvider {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
-        return Jwts.builder()
+        String token =  Jwts.builder()
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .setSubject(userId)
                 .claim(AUTHORITIES_KEY, role)
@@ -54,6 +58,8 @@ public class TokenProvider {
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .compact();
+
+        return token;
     }
 
     public void createRefreshToken(Authentication authentication, HttpServletResponse response) {
