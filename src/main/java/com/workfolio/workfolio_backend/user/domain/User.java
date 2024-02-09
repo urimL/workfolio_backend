@@ -21,6 +21,7 @@ public class User extends BaseEntity {
 
     private String email;
 
+    //nickname 나중에 수정 가능 (일단 null)
     private String name;
 
     private String oauth2Id;
@@ -35,6 +36,13 @@ public class User extends BaseEntity {
         this.name = oAuth2UserInfo.getName();
         this.oauth2Id = oAuth2UserInfo.getOAuth2Id();
 
+        return this;
+    }
+
+
+    //사용자 닉네임 변경
+    public User updateNickname(String nickname) {
+        this.name = nickname;
         return this;
     }
 }

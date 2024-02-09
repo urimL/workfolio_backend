@@ -119,6 +119,7 @@ public class JwtTokenProvider {
     }
 
     private Claims parseClaims(String accessToken) {
+        //accessToken 복호화
         try {
             return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
         } catch (ExpiredJwtException e) {
@@ -126,8 +127,10 @@ public class JwtTokenProvider {
         }
     }
 
+    //요청 헤더에서 accessToken 추출
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_TYPE)) {
             return bearerToken.substring(7);
         }
