@@ -62,7 +62,6 @@ public class InterviewService {
     /** 작성자가 현재 로그인 된 유저가 맞는지 확인 */
     public static void authorizeArticleAuthor(Interview interview) {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println(userName);
         if (!interview.getUserEmail().equals(userName)) {
             throw new IllegalArgumentException("Not Authorized user");
         }

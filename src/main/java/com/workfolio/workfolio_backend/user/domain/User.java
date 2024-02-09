@@ -41,8 +41,7 @@ public class User extends BaseEntity {
 
 
     //사용자 닉네임 변경
-    public User updateNickname(String nickname) {
+    public void updateNickname(String nickname) {
         this.name = nickname;
-        return this;
     }
 }
