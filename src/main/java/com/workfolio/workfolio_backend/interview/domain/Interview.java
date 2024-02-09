@@ -18,6 +18,9 @@ public class Interview {
     @Column(name = "userEmail")
     private String userEmail;
 
+    @Column(name = "nickname")
+    private String nickname;
+
     @Column(name="question", nullable = false, length = 500000)
     private String question;
 
@@ -28,11 +31,12 @@ public class Interview {
     private String cp;
 
     @Builder
-    public Interview(String question, String answer, String cp, String userEmail) {
+    public Interview(String question, String answer, String cp, String userEmail, String nickname) {
         this.question = question;
         this.answer = answer;
         this.cp = cp;
         this.userEmail = userEmail;
+        this.nickname = nickname;
     }
 
     public void update(String question, String answer, String cp){

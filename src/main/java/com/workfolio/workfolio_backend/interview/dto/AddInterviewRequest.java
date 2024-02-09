@@ -14,9 +14,10 @@ public class AddInterviewRequest {
     private String answer;
     private String cp;
 
-    public Interview toEntity(String userEmail) {
+    public Interview toEntity(String nickname, String email) {
         return Interview.builder()
-                .userEmail(userEmail)
+                .nickname(nickname)
+                .userEmail(email)
                 .question(question)
                 .answer(answer)
                 .cp(cp)

@@ -9,13 +9,13 @@ public class InterviewResponse {
     private String question;
     private String answer;
     private String cp;
-
-    private String userEmail;
+    private String nickname;
 
     public InterviewResponse(Interview interview) {
         this.question = interview.getQuestion();
         this.answer = interview.getAnswer();
         this.cp = interview.getCp();
-        this.userEmail = interview.getUserEmail();
+        this.nickname = interview.getNickname();
+
     }
 }

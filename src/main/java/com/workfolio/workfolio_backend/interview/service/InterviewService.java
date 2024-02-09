@@ -27,8 +27,8 @@ public class InterviewService {
     private static UserRepository userRepository;
 
     /** 면접 질문 추가 */
-    public Interview save(AddInterviewRequest request, String email) {
-        return interviewRepository.save(request.toEntity(email));
+    public Interview save(AddInterviewRequest request, String nickname, String email) {
+        return interviewRepository.save(request.toEntity(nickname, email));
     }
 
     /** 전체 목록 조회 */

@@ -5,6 +5,8 @@ import com.workfolio.workfolio_backend.interview.dto.AddInterviewRequest;
 import com.workfolio.workfolio_backend.interview.dto.InterviewResponse;
 import com.workfolio.workfolio_backend.interview.dto.UpdateInterviewRequest;
 import com.workfolio.workfolio_backend.interview.service.InterviewService;
+import com.workfolio.workfolio_backend.user.domain.User;
+import com.workfolio.workfolio_backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +19,15 @@ import java.util.List;
 @RestController
 public class InterviewApiController {
     private final InterviewService interviewService;
+    private final UserService userService;
+
 
     /** 면접 질문 추가 */
-    @PostMapping("/interview/question")
+    @PostMapping("/interview")
     public ResponseEntity<Interview> addQuestion(@RequestBody AddInterviewRequest request, Principal principal) {
-        String email = principal.getName();
-        Interview savedInterview = interviewService.save(request, email);
+        User user = userService.findByEmail(principal.getName());
+
+        Interview savedInterview = interviewService.save(request, user.getNickname(), user.getEmail());
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(savedInterview);
