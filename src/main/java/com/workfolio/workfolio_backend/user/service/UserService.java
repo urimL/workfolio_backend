@@ -3,6 +3,7 @@ package com.workfolio.workfolio_backend.user.service;
 import com.workfolio.workfolio_backend.user.domain.User;
 import com.workfolio.workfolio_backend.user.dto.UpdateUserRequest;
 import com.workfolio.workfolio_backend.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
     }
 
+    @Transactional
     public User update(String email, UpdateUserRequest request) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("not found user"));

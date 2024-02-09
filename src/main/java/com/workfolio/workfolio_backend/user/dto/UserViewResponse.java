@@ -11,10 +11,12 @@ public class UserViewResponse {
     private Long id;
     private String name;
     private String email;
+    private String nickname;
 
     public UserViewResponse(User user) {
         this.id = user.getId();
         this.name = user.getName();
         this.email = user.getEmail();
+        this.nickname = user.getNickname();
     }
 }
