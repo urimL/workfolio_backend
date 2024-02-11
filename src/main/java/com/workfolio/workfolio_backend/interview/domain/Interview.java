@@ -21,7 +21,7 @@ public class Interview {
     @Column(name = "nickname")
     private String nickname;
 
-    @Column(name="question", nullable = false, length = 500000)
+    @Column(name="question", nullable = false, columnDefinition = "LONGTEXT")
     private String question;
 
     @Column(name = "answer", columnDefinition = "LONGTEXT")

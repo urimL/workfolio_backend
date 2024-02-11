@@ -4,19 +4,13 @@ import com.workfolio.workfolio_backend.interview.domain.Interview;
 import com.workfolio.workfolio_backend.interview.dto.AddInterviewRequest;
 import com.workfolio.workfolio_backend.interview.dto.UpdateInterviewRequest;
 import com.workfolio.workfolio_backend.interview.repository.InterviewRepository;
-import com.workfolio.workfolio_backend.user.domain.User;
 import com.workfolio.workfolio_backend.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Transient;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 
 
 @RequiredArgsConstructor
@@ -49,14 +43,14 @@ public class InterviewService {
 
     /** 질문 수정 */
     @Transactional
-    public Interview update(long id, UpdateInterviewRequest req) {
+    public UpdateInterviewRequest update(long id, UpdateInterviewRequest req) {
         Interview interview = interviewRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found interview id : " + id));
 
         authorizeArticleAuthor(interview);
         interview.update(req.getQuestion(), req.getAnswer(), req.getCp());
 
-        return interview;
+        return new UpdateInterviewRequest(req.getQuestion(), req.getAnswer(), req.getCp());
     }
 
     /** 작성자가 현재 로그인 된 유저가 맞는지 확인 */
