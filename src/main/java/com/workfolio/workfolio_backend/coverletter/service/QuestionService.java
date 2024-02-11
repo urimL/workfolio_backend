@@ -1,25 +1,21 @@
-package com.workfolio.workfolio_backend.covoerletter.service;
+package com.workfolio.workfolio_backend.coverletter.service;
 
-import com.workfolio.workfolio_backend.covoerletter.domain.CoverLetter;
-import com.workfolio.workfolio_backend.covoerletter.domain.Question;
-import com.workfolio.workfolio_backend.covoerletter.dto.AddQuestionRequest;
-import com.workfolio.workfolio_backend.covoerletter.dto.UpdateQuestionRequest;
-import com.workfolio.workfolio_backend.covoerletter.repository.CoverLetterRepository;
-import com.workfolio.workfolio_backend.covoerletter.repository.QuestionRepository;
+import com.workfolio.workfolio_backend.coverletter.domain.Question;
+import com.workfolio.workfolio_backend.coverletter.dto.QuestionDto.AddQuestionRequest;
+import com.workfolio.workfolio_backend.coverletter.dto.QuestionDto.UpdateQuestionRequest;
+import com.workfolio.workfolio_backend.coverletter.repository.CoverLetterRepository;
+import com.workfolio.workfolio_backend.coverletter.repository.QuestionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
-    private final CoverLetterRepository coverLetterRepository;
 
     //전체 목록 조회
     public List<Question> findAllByClId(Long cl_id) {
@@ -42,8 +38,14 @@ public class QuestionService {
     }
 
     //문항 삭제
+    @Transactional
     public void delete(Long id) {
         questionRepository.deleteById(id);
     }
 
+    //문항 전체 삭제
+    @Transactional
+    public void deleteAllByClID(long cl_id) {
+        questionRepository.deleteAllByClId(cl_id);
+    }
 }

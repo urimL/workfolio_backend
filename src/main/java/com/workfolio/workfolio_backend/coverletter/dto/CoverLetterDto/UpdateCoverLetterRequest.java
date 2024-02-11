@@ -1,4 +1,4 @@
-package com.workfolio.workfolio_backend.covoerletter.dto;
+package com.workfolio.workfolio_backend.coverletter.dto.CoverLetterDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

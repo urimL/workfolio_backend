@@ -1,10 +1,13 @@
-package com.workfolio.workfolio_backend.covoerletter.controller;
+package com.workfolio.workfolio_backend.coverletter.controller;
 
-import com.workfolio.workfolio_backend.covoerletter.domain.Question;
-import com.workfolio.workfolio_backend.covoerletter.dto.AddQuestionRequest;
-import com.workfolio.workfolio_backend.covoerletter.dto.QuestionResponse;
-import com.workfolio.workfolio_backend.covoerletter.dto.UpdateQuestionRequest;
-import com.workfolio.workfolio_backend.covoerletter.service.QuestionService;
+import com.workfolio.workfolio_backend.coverletter.domain.CoverLetter;
+import com.workfolio.workfolio_backend.coverletter.domain.Question;
+import com.workfolio.workfolio_backend.coverletter.dto.CoverLetterDto.CoverLetterDetailResponse;
+import com.workfolio.workfolio_backend.coverletter.dto.QuestionDto.AddQuestionRequest;
+import com.workfolio.workfolio_backend.coverletter.dto.QuestionDto.QuestionResponse;
+import com.workfolio.workfolio_backend.coverletter.dto.QuestionDto.UpdateQuestionRequest;
+import com.workfolio.workfolio_backend.coverletter.service.CoverLetterService;
+import com.workfolio.workfolio_backend.coverletter.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,7 @@ import java.util.List;
 public class QuestionController {
 
     private final QuestionService questionService;
+    private final CoverLetterService coverLetterService;
 
     //문항 주가
     @PostMapping("/coverletter/{cl_id}")
@@ -43,13 +47,15 @@ public class QuestionController {
 
     //하나의 cp_id에 대한 전체 문항 보기
     @GetMapping("/coverletter/{cl_id}")
-    public ResponseEntity<List<QuestionResponse>> findAllQuestion(@PathVariable Long cl_id) {
+    public ResponseEntity<CoverLetterDetailResponse> findAllQuestion(@PathVariable Long cl_id) {
         List<QuestionResponse> questions = questionService.findAllByClId(cl_id)
                 .stream()
                 .map(QuestionResponse::new)
                 .toList();
 
-        return ResponseEntity.ok().body(questions);
+        CoverLetter coverLetter = coverLetterService.findById(cl_id).get();
+
+        return ResponseEntity.ok().body(new CoverLetterDetailResponse(coverLetter.getCp(), coverLetter.getObjective(), questions));
     }
 
 }

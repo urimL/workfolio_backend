@@ -1,6 +1,6 @@
-package com.workfolio.workfolio_backend.covoerletter.dto;
+package com.workfolio.workfolio_backend.coverletter.dto.QuestionDto;
 
-import com.workfolio.workfolio_backend.covoerletter.domain.Question;
+import com.workfolio.workfolio_backend.coverletter.domain.Question;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

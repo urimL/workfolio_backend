@@ -1,4 +1,4 @@
-package com.workfolio.workfolio_backend.covoerletter.domain;
+package com.workfolio.workfolio_backend.coverletter.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

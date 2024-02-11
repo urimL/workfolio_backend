@@ -1,10 +1,11 @@
-package com.workfolio.workfolio_backend.covoerletter.controller;
+package com.workfolio.workfolio_backend.coverletter.controller;
 
-import com.workfolio.workfolio_backend.covoerletter.domain.CoverLetter;
-import com.workfolio.workfolio_backend.covoerletter.dto.AddCoverLetterRequest;
-import com.workfolio.workfolio_backend.covoerletter.dto.CoverLetterResponse;
-import com.workfolio.workfolio_backend.covoerletter.dto.UpdateCoverLetterRequest;
-import com.workfolio.workfolio_backend.covoerletter.service.CoverLetterService;
+import com.workfolio.workfolio_backend.coverletter.domain.CoverLetter;
+import com.workfolio.workfolio_backend.coverletter.dto.CoverLetterDto.AddCoverLetterRequest;
+import com.workfolio.workfolio_backend.coverletter.dto.CoverLetterDto.CoverLetterListResponse;
+import com.workfolio.workfolio_backend.coverletter.dto.CoverLetterDto.UpdateCoverLetterRequest;
+import com.workfolio.workfolio_backend.coverletter.service.CoverLetterService;
+import com.workfolio.workfolio_backend.coverletter.service.QuestionService;
 import com.workfolio.workfolio_backend.user.domain.User;
 import com.workfolio.workfolio_backend.user.repository.UserRepository;
 import com.workfolio.workfolio_backend.user.service.UserService;
@@ -21,6 +22,7 @@ import java.util.List;
 public class CoverLetterController {
 
     private final CoverLetterService coverLetterService;
+    private final QuestionService questionService;
     private final UserService userService;
     private final UserRepository userRepository;
 
@@ -46,8 +48,8 @@ public class CoverLetterController {
     @DeleteMapping("/coverletter/{id}")
     public ResponseEntity<Void> deleteCoverLetter(@PathVariable long id, Principal principal) {
         if (principal.getName().equals(coverLetterService.findUserEmailById(id))) {
+            questionService.deleteAllByClID(id);
             coverLetterService.delete(id);
-            /** TODO : 문항 삭제 */
 
         } else {
             throw new IllegalArgumentException("Not Authorized User");
@@ -55,13 +57,13 @@ public class CoverLetterController {
         return ResponseEntity.ok().build();
     }
 
-    //전체 목록 보기 (cp만)
+    //전체 목록 보기 (cp/objective)
     @GetMapping("/coverletter")
-    public ResponseEntity<List<CoverLetterResponse>> findAllCoverLetter(Principal principal) {
+    public ResponseEntity<List<CoverLetterListResponse>> findAllCoverLetter(Principal principal) {
         String email = principal.getName();
-        List<CoverLetterResponse> coverLetters = coverLetterService.findAllByEmail(email)
+        List<CoverLetterListResponse> coverLetters = coverLetterService.findAllByEmail(email)
                 .stream()
-                .map(CoverLetterResponse::new)
+                .map(CoverLetterListResponse::new)
                 .toList();
 
         return ResponseEntity.ok()
