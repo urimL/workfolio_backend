@@ -27,25 +27,25 @@ public class CoverLetterController {
     private final UserRepository userRepository;
 
     //자기소개서 추가
-    @PostMapping("/coverletter")
-    public ResponseEntity<CoverLetter> addCoverLetter(@RequestBody AddCoverLetterRequest request, Principal principal) {
+    @PostMapping("/coverletters")
+    public ResponseEntity<AddCoverLetterRequest> addCoverLetter(@RequestBody AddCoverLetterRequest request, Principal principal) {
         User user = userService.findByEmail(principal.getName());
         String nickname = userRepository.findByEmail(principal.getName()).get().getNickname();
         CoverLetter savedCoverLetter = coverLetterService.save(request, nickname, principal.getName());
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(savedCoverLetter);
+                .body(new AddCoverLetterRequest(savedCoverLetter.getCp(), savedCoverLetter.getObjective()));
     }
 
     //자기소개서 수정 (cp, objective)
-    @PutMapping("coverletter/{id}")
-    public ResponseEntity<CoverLetter> updateCoverLetter(@PathVariable Long id, @RequestBody UpdateCoverLetterRequest request) {
+    @PutMapping("coverletters/{id}")
+    public ResponseEntity<UpdateCoverLetterRequest> updateCoverLetter(@PathVariable Long id, @RequestBody UpdateCoverLetterRequest request) {
         CoverLetter updated = coverLetterService.update(id, request);
-        return ResponseEntity.ok().body(updated);
+        return ResponseEntity.ok().body(new UpdateCoverLetterRequest(updated.getCp(), updated.getObjective()));
     }
 
     //자기소개서 삭제
-    @DeleteMapping("/coverletter/{id}")
+    @DeleteMapping("/coverletters/{id}")
     public ResponseEntity<Void> deleteCoverLetter(@PathVariable long id, Principal principal) {
         if (principal.getName().equals(coverLetterService.findUserEmailById(id))) {
             questionService.deleteAllByClID(id);
@@ -58,7 +58,7 @@ public class CoverLetterController {
     }
 
     //전체 목록 보기 (cp/objective)
-    @GetMapping("/coverletter")
+    @GetMapping("/coverletters")
     public ResponseEntity<List<CoverLetterListResponse>> findAllCoverLetter(Principal principal) {
         String email = principal.getName();
         List<CoverLetterListResponse> coverLetters = coverLetterService.findAllByEmail(email)

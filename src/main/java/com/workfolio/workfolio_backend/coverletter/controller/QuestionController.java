@@ -25,17 +25,17 @@ public class QuestionController {
 
     //문항 주가
     @PostMapping("/coverletter/{cl_id}")
-    public ResponseEntity<Question> addQuestion(@RequestBody AddQuestionRequest request, @PathVariable long cl_id, Principal principal) {
+    public ResponseEntity<AddQuestionRequest> addQuestion(@RequestBody AddQuestionRequest request, @PathVariable long cl_id, Principal principal) {
         Question savedQuestion = questionService.save(request, cl_id);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(savedQuestion);
+                .body(new AddQuestionRequest(savedQuestion.getQuestion(), savedQuestion.getAnswer()));
     }
 
     //문항 수정 (질문, 답변)
     @PutMapping("/coverletter/{cl_id}/{q_id}")
-    public ResponseEntity<Question> updateQuestion(@PathVariable Long q_id, @RequestBody UpdateQuestionRequest request) {
+    public ResponseEntity<UpdateQuestionRequest> updateQuestion(@PathVariable Long q_id, @RequestBody UpdateQuestionRequest request) {
         Question updatedQuestion = questionService.update(q_id, request);
-        return ResponseEntity.ok().body(updatedQuestion);
+        return ResponseEntity.ok().body(new UpdateQuestionRequest(updatedQuestion.getQuestion(), updatedQuestion.getAnswer()));
     }
 
     //문항 삭제
