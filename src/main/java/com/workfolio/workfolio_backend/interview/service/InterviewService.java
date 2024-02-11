@@ -4,19 +4,13 @@ import com.workfolio.workfolio_backend.interview.domain.Interview;
 import com.workfolio.workfolio_backend.interview.dto.AddInterviewRequest;
 import com.workfolio.workfolio_backend.interview.dto.UpdateInterviewRequest;
 import com.workfolio.workfolio_backend.interview.repository.InterviewRepository;
-import com.workfolio.workfolio_backend.user.domain.User;
 import com.workfolio.workfolio_backend.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Transient;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 
 
 @RequiredArgsConstructor
