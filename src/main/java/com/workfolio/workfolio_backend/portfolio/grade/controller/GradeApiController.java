@@ -1,10 +1,10 @@
-package com.workfolio.workfolio_backend.grade.controller;
+package com.workfolio.workfolio_backend.portfolio.grade.controller;
 
-import com.workfolio.workfolio_backend.grade.domain.Grade;
-import com.workfolio.workfolio_backend.grade.dto.AddGradeRequest;
-import com.workfolio.workfolio_backend.grade.dto.GradeResponse;
-import com.workfolio.workfolio_backend.grade.dto.UpdateGradeRequest;
-import com.workfolio.workfolio_backend.grade.service.GradeService;
+import com.workfolio.workfolio_backend.portfolio.grade.domain.Grade;
+import com.workfolio.workfolio_backend.portfolio.grade.dto.AddGradeRequest;
+import com.workfolio.workfolio_backend.portfolio.grade.dto.GradeResponse;
+import com.workfolio.workfolio_backend.portfolio.grade.dto.UpdateGradeRequest;
+import com.workfolio.workfolio_backend.portfolio.grade.service.GradeService;
 import com.workfolio.workfolio_backend.user.domain.User;
 import com.workfolio.workfolio_backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;

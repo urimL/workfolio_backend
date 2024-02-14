@@ -1,4 +1,4 @@
-package com.workfolio.workfolio_backend.grade.domain;
+package com.workfolio.workfolio_backend.portfolio.grade.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

@@ -1,6 +1,6 @@
-package com.workfolio.workfolio_backend.grade.dto;
+package com.workfolio.workfolio_backend.portfolio.grade.dto;
 
-import com.workfolio.workfolio_backend.grade.domain.Grade;
+import com.workfolio.workfolio_backend.portfolio.grade.domain.Grade;
 import lombok.Getter;
 
 @Getter

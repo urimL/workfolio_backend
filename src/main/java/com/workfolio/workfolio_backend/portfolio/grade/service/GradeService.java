@@ -1,12 +1,9 @@
-package com.workfolio.workfolio_backend.grade.service;
+package com.workfolio.workfolio_backend.portfolio.grade.service;
 
-import com.workfolio.workfolio_backend.grade.domain.Grade;
-import com.workfolio.workfolio_backend.grade.dto.AddGradeRequest;
-import com.workfolio.workfolio_backend.grade.dto.UpdateGradeRequest;
-import com.workfolio.workfolio_backend.grade.repository.GradeRepository;
-import com.workfolio.workfolio_backend.interview.domain.Interview;
-import com.workfolio.workfolio_backend.interview.dto.UpdateInterviewRequest;
-import com.workfolio.workfolio_backend.user.repository.UserRepository;
+import com.workfolio.workfolio_backend.portfolio.grade.domain.Grade;
+import com.workfolio.workfolio_backend.portfolio.grade.dto.AddGradeRequest;
+import com.workfolio.workfolio_backend.portfolio.grade.dto.UpdateGradeRequest;
+import com.workfolio.workfolio_backend.portfolio.grade.repository.GradeRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;

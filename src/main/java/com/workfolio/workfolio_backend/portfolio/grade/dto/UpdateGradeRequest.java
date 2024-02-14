@@ -1,4 +1,4 @@
-package com.workfolio.workfolio_backend.grade.dto;
+package com.workfolio.workfolio_backend.portfolio.grade.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
