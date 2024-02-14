@@ -18,7 +18,6 @@ import java.util.List;
 public class InterviewService {
 
     private final InterviewRepository interviewRepository;
-    private static UserRepository userRepository;
 
     /** 면접 질문 추가 */
     public Interview save(AddInterviewRequest request, String nickname, String email) {
