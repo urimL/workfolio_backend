@@ -55,7 +55,7 @@ public class InterviewApiController {
         if (principal.getName().equals(interviewService.findUserEmailById(id))) {
             interviewService.delete(id);
         } else {
-            throw new IllegalArgumentException("Not Authorized User");
+            throw new IllegalArgumentException("Cannot delete : Not Authorized User");
         }
 
         return ResponseEntity.ok().build();
