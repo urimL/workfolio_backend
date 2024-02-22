@@ -11,14 +11,11 @@ import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.beans.BeanProperty;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
@@ -50,6 +47,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
+    protected Cookie setRefreshToken(String refreshToken) {
+        Cookie cookie = new Cookie("refreshToken", refreshToken);
+        System.out.println(refreshToken);
+        return cookie;
+    }
+
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         Optional<String> redirectUri = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
@@ -61,6 +64,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         //JWT 생성
         UserResponseDto.TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
+        String refreshToken = tokenInfo.getRefreshToken();
+
+        //refresh token을 쿠키에 담아 response header 통해 전송
+        Cookie refreshtCookie = setRefreshToken(refreshToken);
+        refreshtCookie.setHttpOnly(true);
+        refreshtCookie.setSecure(false);
+        response.addCookie(refreshtCookie);
 
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", tokenInfo.getAccessToken())
